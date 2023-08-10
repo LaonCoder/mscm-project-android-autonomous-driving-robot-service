@@ -1,4 +1,4 @@
-package com.example.mscmproject.feature_login.presentation.sign_in
+package com.example.mscmproject.feature_auth.presentation.sign_in
 
 import android.content.Context
 import android.content.Intent
@@ -18,7 +18,6 @@ class GoogleAuthUiClient(
     private val oneTapClient: SignInClient
 ) {
     private val auth = Firebase.auth
-
     private val WEB_CLIENT_ID = BuildConfig.WEB_CLIENT_ID
 
     suspend fun signIn(): IntentSender? {

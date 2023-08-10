@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.gms.google-services")
+    id("com.google.dagger.hilt.android")
 }
 
 kotlin {
@@ -83,7 +84,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // firebase auth
-    implementation("com.google.firebase:firebase-auth-ktx:21.1.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:20.6.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
@@ -98,6 +100,12 @@ dependencies {
 
     // coil
     implementation("io.coil-kt:coil-compose:2.2.2")
+
+    // dagger-hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
 }
 
 fun getApiKey(propertyKey: String): String {

@@ -1,4 +1,4 @@
-package com.example.mscmproject.feature_login.presentation.profile
+package com.example.mscmproject.feature_main.presentation.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,10 +14,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.mscmproject.feature_login.presentation.sign_in.UserData
+import com.example.mscmproject.feature_auth.presentation.sign_in.UserData
 
 @Composable
-fun ProfileScreen(
+fun MainScreen(
     userData: UserData?,
     onSignOut: () -> Unit
 ) {

@@ -1,4 +1,4 @@
-package com.example.mscmproject.feature_login.presentation.sign_in
+package com.example.mscmproject.feature_auth.presentation.sign_in
 
 data class SignInResult(
     val data: UserData?,

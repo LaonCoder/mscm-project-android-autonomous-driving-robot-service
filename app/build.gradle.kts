@@ -83,25 +83,26 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    // firebase auth
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:20.6.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
-    // view model
+    // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
 
-    // lifecycle compose
+    // Lifecycle Compose
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
 
-    // navigation
+    // Navigation
     implementation("androidx.navigation:navigation-compose:2.5.3")
 
-    // coil
+    // Coil
     implementation("io.coil-kt:coil-compose:2.2.2")
 
-    // dagger-hilt
+    // Dagger-Hilt
     implementation("com.google.dagger:hilt-android:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0-alpha01")
     kapt("com.google.dagger:hilt-android-compiler:2.44")

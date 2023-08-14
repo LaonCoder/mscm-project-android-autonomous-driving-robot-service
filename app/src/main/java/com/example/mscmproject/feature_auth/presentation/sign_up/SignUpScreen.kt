@@ -129,7 +129,7 @@ fun SignUpScreen(
         Button(
             onClick = {
                 scope.launch {
-                    viewModel.registerUser(state.email, state.password)
+                    viewModel.firebaseSignUp(state.email, state.password)
                 }
             },
             modifier = Modifier

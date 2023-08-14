@@ -1,5 +1,7 @@
 package com.example.mscmproject.feature_auth.presentation.sign_in
 
+import android.app.Activity.RESULT_OK
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,42 +43,57 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.mscmproject.feature_auth.presentation.AuthViewModel
 import com.example.mscmproject.navigation.Screen
+import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider.getCredential
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
-    googleAuthUiClient: GoogleAuthUiClient,
     navController: NavController,
-    activityScope: LifecycleCoroutineScope,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val state by viewModel.signInState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val applicationContext = LocalContext.current.applicationContext
     val scope = rememberCoroutineScope()
-
-
-    LaunchedEffect(key1 = Unit) {
-        if(googleAuthUiClient.getSignedInUser() != null) {
-            navController.navigate(Screen.Main.route)
-        }
-    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
         onResult = { result ->
-            if(result.resultCode == ComponentActivity.RESULT_OK) {
-                activityScope.launch {
-                    val signInResult = googleAuthUiClient.signInWithIntent(
-                        intent = result.data ?: return@launch
-                    )
-                    viewModel.onSignInResult(signInResult)
+            if (result.resultCode == RESULT_OK) {
+                try {
+                    val credentials = viewModel.oneTapClient.getSignInCredentialFromIntent(result.data)
+                    val googleIdToken = credentials.googleIdToken
+                    val googleCredentials = getCredential(googleIdToken, null)
+                    Log.d("Google OneTap", "Login Start")
+                    viewModel.signInWithGoogle(googleCredentials)
+                } catch (it: ApiException) {
+                    print(it)
                 }
             }
         }
     )
+
+    fun launch(signInResult: BeginSignInResult) {
+        val intent = IntentSenderRequest.Builder(signInResult.pendingIntent.intentSender).build()
+        launcher.launch(intent)
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        if(viewModel.getSignedInUser() != null) {
+            navController.navigate(Screen.Main.route)
+        }
+    }
+    
+    LaunchedEffect(key1 = state.oneTapSignInResponse) {
+        if (state.oneTapSignInResponse?.data != null) {
+            state.oneTapSignInResponse?.data?.let {
+                launch(it)
+            }
+        }
+    }
 
     LaunchedEffect(key1 = state.isSignInSuccessful) {
         if(state.isSignInSuccessful) {
@@ -98,7 +115,7 @@ fun SignInScreen(
     LaunchedEffect(key1 = state.signInError) {
         state.signInError?.let { error ->
             Toast.makeText(
-                context,
+                applicationContext,
                 error,
                 Toast.LENGTH_LONG
             ).show()
@@ -158,7 +175,10 @@ fun SignInScreen(
         Button(
             onClick = {
                 scope.launch {
-                    viewModel.login(state.email.trim(), state.password.trim())
+                    viewModel.firebaseSignIn(
+                        state.email,
+                        state.password
+                    )
                 }
             },
             modifier = Modifier
@@ -207,16 +227,7 @@ fun SignInScreen(
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
-                onClick = {
-                    activityScope.launch {
-                        val signInIntentSender = googleAuthUiClient.signIn()
-                        launcher.launch(
-                            IntentSenderRequest.Builder(
-                                signInIntentSender ?: return@launch
-                            ).build()
-                        )
-                    }
-                }
+                onClick = { viewModel.oneTapSignInWithGoogle() }
             ) {
                 Text(text = "Google Login")
             }

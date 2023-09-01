@@ -1,5 +1,6 @@
 package com.example.mscmproject.feature_main.presentation.home.components
 
+import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -14,6 +15,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.example.mscmproject.core.Constants.PROFILE_SCREEN
 import com.example.mscmproject.core.Constants.REVOKE_ACCESS
 import com.example.mscmproject.core.Constants.SIGN_OUT
@@ -27,6 +30,7 @@ fun HomeTopBar(
     var openMenu by remember { mutableStateOf(false) }
 
     TopAppBar(
+        modifier = Modifier.background(Color.Transparent),
         title = {
             Text(text = PROFILE_SCREEN)
         },

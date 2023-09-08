@@ -4,7 +4,7 @@ data class HomeUiState(
     /* Ui */
 
     // Dialog
-    val showServiceLocationDialog: Boolean = false,
+    val showServiceAreaDialog: Boolean = false,
     val showDepartureDialog: Boolean = false,
     val showDestinationDialog: Boolean = false,
 
@@ -16,10 +16,11 @@ data class HomeUiState(
     // Common
     val isLoading: Boolean = false,
     val isInitialComposition: Boolean = true,
+    val hasAvailableGpsPath: Boolean = false,
 
     // Fetch serviceLocation data
-    val isFetchServiceLocationSuccessful: Boolean = false,
-    val fetchServiceLocationError: String? = null,
+    val isFetchServiceAreaSuccessful: Boolean = false,
+    val fetchServiceAreaError: String? = null,
 
     // Sign out
     val isSignOutSuccessful: Boolean = false,

@@ -8,7 +8,6 @@ import com.example.mscmproject.feature_main.domain.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +24,17 @@ class HomeViewModel @Inject constructor(
 
     val displayName get() = homeRepository.displayName
     val photoUrl get() = homeRepository.photoUrl
+
+    fun getCurrentUser() {
+        val currentUser = homeRepository.getCurrentUser()
+        if (currentUser != null) {
+            _homeUiData.update {
+                it.copy(currentUser = currentUser)
+            }
+        } else {
+            Log.d("HomeViewModel/getCurrentUser()", "Cannot fetch Firebase user info.")
+        }
+    }
 
     fun signOut() = viewModelScope.launch {
         homeRepository.signOut().collect { result ->
@@ -92,39 +102,37 @@ class HomeViewModel @Inject constructor(
 
     fun resetStates() {
         _homeUiState.update { HomeUiState() }
+        _homeUiData.update { HomeUiData() }
     }
-
-
-    // ------------------------------test-----------------------------------
 
     fun checkInitialComposition() {
         _homeUiState.update { it.copy(isInitialComposition = false) }
     }
 
-    suspend fun fetchServiceLocation() = viewModelScope.launch {
-        homeRepository.fetchServiceLocation().collect() { result ->
+    suspend fun fetchServiceArea() = viewModelScope.launch {
+        homeRepository.fetchServiceArea().collect() { result ->
             when(result) {
                 is Resource.Success -> {
                     if (!(result.data.isNullOrEmpty())) {
-                        Log.d("HomeViewModel/fetchServiceLocation()", result.data.toString())
+                        Log.d("HomeViewModel/fetchServiceLocations()", result.data.toString())
                         _homeUiData.update {
                             it.copy(
-                                serviceLocations = result.data,
-                                serviceLocation = result.data.find { location -> location.areaCode == 1 }
+                                serviceAreas = result.data,
+                                serviceArea = result.data.find { area -> area.areaCode == 1 }
                             )
                         }
                         _homeUiState.update {
                             it.copy(
                                 isLoading = false,
-                                isFetchServiceLocationSuccessful = true,
-                                fetchServiceLocationError = null
+                                isFetchServiceAreaSuccessful = true,
+                                fetchServiceAreaError = null
                             )
                         }
                     } else {
-                        Log.d("HomeViewModel/fetchServiceLocation()", "Service Location data is null or empty")
+                        Log.d("HomeViewModel/fetchServiceLocation()", "Service area data is null or empty")
                         _homeUiState.update {
                             it.copy(
-                                fetchServiceLocationError = "Unknown error occurred while retrieving service location data from Firestore."
+                                fetchServiceAreaError = "Unknown error occurred while retrieving service location data from Firestore."
                             )
                         }
                     }
@@ -133,7 +141,7 @@ class HomeViewModel @Inject constructor(
                     _homeUiState.update {
                         it.copy(
                             isLoading = true,
-                            fetchServiceLocationError = null
+                            fetchServiceAreaError = null
                         )
                     }
                 }
@@ -141,26 +149,42 @@ class HomeViewModel @Inject constructor(
                     _homeUiState.update {
                         it.copy(
                             isLoading = false,
-                            fetchServiceLocationError = result.message
+                            fetchServiceAreaError = result.message
                         )
                     }
                 }
             }
         }
-        Log.d("HomeViewModel/fetchServiceLocation()", "Function ended.")
     }
 
-    fun selectServiceLocation(location: String) {
-        val serviceLocation = homeUiData.value.serviceLocations.find { it.location == location }
+    fun selectServiceLocation(area: String) {
+        val serviceArea = homeUiData.value.serviceAreas.find { it.areaName == area }
         _homeUiData.update {
-            it.copy(serviceLocation = serviceLocation)
+            it.copy(
+                serviceArea = serviceArea,
+                gpsPath = null,
+                departurePoint = null,
+                destinationPoint = null
+            )
+        }
+    }
+
+    fun checkAndUpdateGpsPath() {
+        val pathName = homeUiData.value.departurePoint + "@" + homeUiData.value.destinationPoint
+        val gpsPath = homeUiData.value.serviceArea!!.gpsPaths.find { it.pathName == pathName }
+        if (gpsPath != null) {
+            _homeUiData.update { it.copy(gpsPath = gpsPath) }
+            _homeUiState.update { it.copy(hasAvailableGpsPath = true) }
+        } else {
+            _homeUiData.update { it.copy(gpsPath = null) }
+            _homeUiState.update { it.copy(hasAvailableGpsPath = false) }
         }
     }
 
     fun selectDeparturePoint(point: String) {
-        if (homeUiData.value.serviceLocation!!.points.contains(point)) {
+        if (homeUiData.value.serviceArea!!.servicePoints.find { it.pointName == point } != null) {
             _homeUiData.update {
-                it.copy(departureLocation = point)
+                it.copy(departurePoint = point)
             }
         } else {
             Log.d("HomeViewModel/selectDestinationPoint()", "Invaild departure point selected.")
@@ -168,9 +192,9 @@ class HomeViewModel @Inject constructor(
     }
 
     fun selectDestinationPoint(point: String) {
-        if (homeUiData.value.serviceLocation!!.points.contains(point)) {
+        if (homeUiData.value.serviceArea!!.servicePoints.find { it.pointName == point } != null) {
             _homeUiData.update {
-                it.copy(destinationLocation = point)
+                it.copy(destinationPoint = point)
             }
         } else {
             Log.d("HomeViewModel/selectDeparturePoint()", "Invaild destination point selected.")
@@ -179,7 +203,7 @@ class HomeViewModel @Inject constructor(
 
     fun showServiceLocationDialog(show: Boolean) {
         _homeUiState.update {
-            it.copy(showServiceLocationDialog = show)
+            it.copy(showServiceAreaDialog = show)
         }
     }
 
@@ -200,5 +224,4 @@ class HomeViewModel @Inject constructor(
             it.copy(showDestinationDialog = show)
         }
     }
-
 }

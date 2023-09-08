@@ -98,10 +98,11 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.6.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     // ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0")
+    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
 
     // Lifecycle Compose
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
@@ -121,6 +122,9 @@ dependencies {
     // Google Map
     implementation("com.google.maps.android:maps-compose:2.14.0")
     implementation("com.google.android.gms:play-services-maps:18.1.0")
+
+    // Extended Icons
+    implementation("androidx.compose.material:material-icons-extended:1.4.3")
 }
 
 fun getApiKey(propertyKey: String): String {

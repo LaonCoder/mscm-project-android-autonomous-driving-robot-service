@@ -25,8 +25,6 @@ import androidx.compose.ui.unit.dp
 import com.example.mscmproject.feature_main.presentation.home.HomeUiData
 import com.example.mscmproject.feature_main.presentation.home.HomeUiState
 import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.GoogleMap
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeContent(
@@ -36,7 +34,7 @@ fun HomeContent(
     onDrawerButtonClick: () -> Unit,
     onServiceLocationSelectButtonClick: () -> Unit,
     onPlaceSelectionDialogDismiss: () -> Unit,
-    onServiceLocationSelect: (String) -> Unit,
+    onServiceAreaSelect: (String) -> Unit,
     onCallButtonClick: () -> Unit,
 ) {
     Box(
@@ -44,6 +42,8 @@ fun HomeContent(
             .fillMaxSize()
     ) {
         GoogleMapContent(
+            uiData = uiData,
+            uiState = uiState,
             cameraPositionState = cameraPositionState
         )
         Column(
@@ -64,7 +64,7 @@ fun HomeContent(
                 ,
                 onClick = { onServiceLocationSelectButtonClick() }
             ) {
-                Text( uiData.serviceLocation?.location ?: "서비스 지역을 선택해 주세요." )
+                Text( uiData.serviceArea?.areaName ?: "서비스 지역을 선택해 주세요." )
             }
             Spacer(modifier = Modifier.height(10.dp))
             Button(
@@ -91,15 +91,15 @@ fun HomeContent(
             )
         }
 
-        if (uiState.showServiceLocationDialog) {
+        if (uiState.showServiceAreaDialog) {
             PlaceSelectionDialog(
                 text = "서비스 지역을 선택해주세요.",
-                places = uiData.serviceLocations.map { it.location },
+                places = uiData.serviceAreas.map { it.areaName },
                 onDismiss = {
                     onPlaceSelectionDialogDismiss()
                 },
-                onSelect = { location ->
-                    onServiceLocationSelect(location)
+                onSelect = { area ->
+                    onServiceAreaSelect(area)
                 }
             )
         }

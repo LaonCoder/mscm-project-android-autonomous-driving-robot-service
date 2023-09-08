@@ -28,8 +28,8 @@ fun HomeDrawerContent(
 ) {
     Box(
     modifier = Modifier
-    .fillMaxWidth()
-    .padding(vertical = 64.dp),
+        .fillMaxWidth()
+        .padding(vertical = 64.dp),
     ) {
         IconButton(
             onClick = { onNavBackButtonClick() },
@@ -50,41 +50,52 @@ fun HomeDrawerContent(
     Button(
         onClick = { onUserInfoButtonClick() },
         modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 5.dp, horizontal = 10.dp)
+            .fillMaxWidth()
+            .padding(vertical = 5.dp, horizontal = 10.dp)
     ) {
         Text("사용자 정보 수정")
     }
     Button(
         onClick = { onUsageInfoButtonClick() },
         modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 5.dp, horizontal = 10.dp)
+            .fillMaxWidth()
+            .padding(vertical = 5.dp, horizontal = 10.dp)
     ) {
         Text("사용 방법 안내")
     }
     Button(
         onClick = { onSignOutButtonClick() },
         modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 5.dp, horizontal = 10.dp)
+            .fillMaxWidth()
+            .padding(vertical = 5.dp, horizontal = 10.dp)
     ) {
         Text("로그아웃")
     }
     Button(
         onClick = { onRevokeAccessButtonClick() },
         modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 5.dp, horizontal = 10.dp)
+            .fillMaxWidth()
+            .padding(vertical = 5.dp, horizontal = 10.dp)
     ) {
         Text("계정 삭제")
     }
     Button(
-    onClick = { onExitButtonClick() },
-    modifier = Modifier
-    .fillMaxWidth()
-    .padding(vertical = 5.dp, horizontal = 10.dp)
+        onClick = { onExitButtonClick() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp, horizontal = 10.dp)
     ) {
         Text("EXIT")
     }
+    Button(
+        onClick = { onUserInfoButtonClick() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp, horizontal = 10.dp)
+    ) {
+        Text("사용자 정보 수정")
+    }
+
+    // TODO : Use only for testing!!!
+    // DataUploadButton()
 }

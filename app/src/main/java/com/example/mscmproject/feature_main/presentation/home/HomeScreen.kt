@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.mscmproject.feature_main.presentation.home.components.DispatchConfirmationDialog
 import com.example.mscmproject.feature_main.presentation.home.components.HomeBottomSheet
 import com.example.mscmproject.feature_main.presentation.home.components.HomeContent
 import com.example.mscmproject.feature_main.presentation.home.components.HomeDrawerContent
@@ -95,6 +96,7 @@ fun HomeScreen(
     LaunchedEffect(key1 = uiState.isInitialComposition) {
         if (uiState.isInitialComposition) {
             Log.d("HomeScreen/isInitialComposition", "True")
+            viewModel.getCurrentUser()
             viewModel.fetchServiceArea()
             viewModel.checkInitialComposition()
         } else {
@@ -126,6 +128,25 @@ fun HomeScreen(
                 ),
                 uiData.serviceArea!!.defaultCameraZoomScale
             )
+        }
+    }
+
+    LaunchedEffect(
+        key1 = uiState.isDispatchRobotSuccessful
+    ) {
+        if (uiState.isDispatchRobotSuccessful) {
+            Toast.makeText(
+                applicationContext,
+                "Dispatch successful",
+                Toast.LENGTH_LONG
+            ).show()
+
+//            navController.navigate(Screen.Login.route) {
+//                popUpTo(Screen.Main.route) {
+//                    inclusive = true
+//                }
+//            }
+            viewModel.resetStates()
         }
     }
 
@@ -189,7 +210,8 @@ fun HomeScreen(
                             }
                         },
                         onDepartureSelectButtonClick = { viewModel.showDepartureDialog(true) },
-                        onDestinationSelectButtonClick = { viewModel.showDestinationDialog(true) }
+                        onDestinationSelectButtonClick = { viewModel.showDestinationDialog(true) },
+                        onDispatchButtonClick = { viewModel.showDispatchConfirmationDialog(true) }
                     )
                 }
 
@@ -208,6 +230,18 @@ fun HomeScreen(
                         places = uiData.serviceArea!!.servicePoints.map { it.pointName },
                         onDismiss = { viewModel.showDestinationDialog(false) },
                         onSelect = { point -> viewModel.selectDestinationPoint(point) }
+                    )
+                }
+
+                if (uiState.showDispatchConfirmationDialog) {
+                    DispatchConfirmationDialog(
+                        departure = uiData.departurePoint!!,
+                        destination = uiData.destinationPoint!!,
+                        onDismiss = { viewModel.showDispatchConfirmationDialog(false) },
+                        onConfirm = {
+                            viewModel.showDispatchConfirmationDialog(false)
+                            scope.launch { viewModel.dispatchRobot() }
+                        }
                     )
                 }
             }

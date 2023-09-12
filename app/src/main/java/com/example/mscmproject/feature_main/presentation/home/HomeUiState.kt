@@ -7,6 +7,7 @@ data class HomeUiState(
     val showServiceAreaDialog: Boolean = false,
     val showDepartureDialog: Boolean = false,
     val showDestinationDialog: Boolean = false,
+    val showDispatchConfirmationDialog: Boolean = false,
 
     // Bottom sheet
     val showHomeBottomSheet: Boolean = false,
@@ -21,6 +22,10 @@ data class HomeUiState(
     // Fetch serviceLocation data
     val isFetchServiceAreaSuccessful: Boolean = false,
     val fetchServiceAreaError: String? = null,
+
+    // Dispatch robot
+    val isDispatchRobotSuccessful: Boolean = false,
+    val dispatchRobotError: String? = null,
 
     // Sign out
     val isSignOutSuccessful: Boolean = false,

@@ -87,14 +87,6 @@ fun HomeDrawerContent(
     ) {
         Text("EXIT")
     }
-    Button(
-        onClick = { onUserInfoButtonClick() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp, horizontal = 10.dp)
-    ) {
-        Text("사용자 정보 수정")
-    }
 
     // TODO : Use only for testing!!!
     // DataUploadButton()

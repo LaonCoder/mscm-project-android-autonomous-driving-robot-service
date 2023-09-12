@@ -1,12 +1,10 @@
 package com.example.mscmproject.feature_main.data.repository
 
-import android.app.Service
 import android.util.Log
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mscmproject.core.Constants.TAG
 import com.example.mscmproject.core.Constants.USER
 import com.example.mscmproject.feature_auth.domain.util.Resource
 import com.example.mscmproject.feature_main.domain.model.GpsPath
+import com.example.mscmproject.feature_main.domain.model.InvalidDispatchException
 import com.example.mscmproject.feature_main.domain.model.InvalidGpsPathException
 import com.example.mscmproject.feature_main.domain.model.InvalidServiceAreaException
 import com.example.mscmproject.feature_main.domain.model.InvalidServicePointException
@@ -15,9 +13,12 @@ import com.example.mscmproject.feature_main.domain.model.ServicePoint
 import com.example.mscmproject.feature_main.domain.repository.HomeRepository
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -146,8 +147,63 @@ class HomeRepositoryImpl(
         }
     }
 
-    override suspend fun callAvailableRobot(): Flow<Resource<ArrayList<ServiceArea>>> {
-        TODO("Not yet implemented")
+    override suspend fun dispatchRobot(
+        user: String,
+        areaName: String,
+        departure: String,
+        destination: String
+    ): Flow<Resource<Boolean>> {
+        return flow {
+            emit(Resource.Loading())
+            val dispatchDocRef = db.collection("dispatch")
+                .document(areaName)
+                .collection("robots")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .whereEqualTo("status", "IDLE")
+                .limit(1)
+                .get()
+                .await()
+                .documents.first().reference
+
+            db.runTransaction { transaction ->
+                val snapshot = transaction.get(dispatchDocRef)
+                val status = snapshot.getString("status")
+                val currentTimestamp = Timestamp(System.currentTimeMillis() / 1000, 0)
+
+                when (status) {
+                    "IDLE" -> {
+                        transaction
+                            .update(
+                                dispatchDocRef, mapOf(
+                                    "user" to user,
+                                    "departure" to departure,
+                                    "destination" to destination,
+                                    "status" to "RESERVED",
+                                    "timestamp" to currentTimestamp
+                                )
+                            )
+                    }
+                    // in case "RESERVED"
+                    else -> {
+                        throw FirebaseFirestoreException(
+                            "There are no available robots at the moment.",
+                            FirebaseFirestoreException.Code.ABORTED,
+                        )
+                    }
+                }
+            }.addOnSuccessListener { result ->
+                Log.d("HomeRepositoryImpl/dispatchRobot()", "Transaction success: $result.")
+            }.addOnFailureListener { e ->
+                Log.d("HomeRepositoryImpl/dispatchRobot()", "Transaction failure.")
+                throw InvalidDispatchException(
+                    e.message ?: "[Transaction Failure] Cannot dispatch robots at the moment. "
+                )
+            }
+            emit(Resource.Success(true))
+        }.catch {
+            Log.d("HomeRepositoryImpl/dispatchRobot()", it.message.toString())
+            emit(Resource.Error(it.message.toString()))
+        }
     }
 
 

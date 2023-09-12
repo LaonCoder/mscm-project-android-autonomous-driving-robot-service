@@ -81,7 +81,7 @@ fun HomeContent(
                 .align(Alignment.TopEnd)
                 .padding(top = 30.dp),
             colors = ButtonDefaults.buttonColors(Color.White),
-            shape = RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp)
+            shape = RoundedCornerShape(20.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Menu,

@@ -36,6 +36,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun userExists() = homeUiData.value.currentUser != null
+
+    fun userEmailExists() = if (userExists()) { homeUiData.value.currentUser!!.email != null } else false
+
     fun signOut() = viewModelScope.launch {
         homeRepository.signOut().collect { result ->
             when(result) {
@@ -172,7 +176,10 @@ class HomeViewModel @Inject constructor(
     fun checkAndUpdateGpsPath() {
         val pathName = homeUiData.value.departurePoint + "@" + homeUiData.value.destinationPoint
         val gpsPath = homeUiData.value.serviceArea!!.gpsPaths.find { it.pathName == pathName }
-        if (gpsPath != null) {
+        if (
+            homeUiData.value.serviceArea != null &&
+            gpsPath != null
+        ) {
             _homeUiData.update { it.copy(gpsPath = gpsPath) }
             _homeUiState.update { it.copy(hasAvailableGpsPath = true) }
         } else {
@@ -201,6 +208,47 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    suspend fun dispatchRobot() = viewModelScope.launch {
+         if (userEmailExists()) {
+            homeRepository.dispatchRobot(
+                user = homeUiData.value.currentUser!!.email!!,
+                areaName = homeUiData.value.serviceArea!!.areaName,
+                departure = homeUiData.value.departurePoint!!,
+                destination = homeUiData.value.destinationPoint!!
+            ).collect() { result ->
+                when(result) {
+                    is Resource.Success -> {
+                        _homeUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isDispatchRobotSuccessful = true,
+                                dispatchRobotError = null
+                            )
+                        }
+                    }
+                    is Resource.Loading -> {
+                        _homeUiState.update {
+                            it.copy(
+                                isLoading = true,
+                                dispatchRobotError = null
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _homeUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                dispatchRobotError = result.message
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+            Log.d("HomeViewModel/dispatchRobot()", "Cannot find current user from firebase.")
+        }
+    }
+
     fun showServiceLocationDialog(show: Boolean) {
         _homeUiState.update {
             it.copy(showServiceAreaDialog = show)
@@ -222,6 +270,12 @@ class HomeViewModel @Inject constructor(
     fun showDestinationDialog(show: Boolean) {
         _homeUiState.update {
             it.copy(showDestinationDialog = show)
+        }
+    }
+
+    fun showDispatchConfirmationDialog(show: Boolean) {
+        _homeUiState.update {
+            it.copy(showDispatchConfirmationDialog = show)
         }
     }
 }

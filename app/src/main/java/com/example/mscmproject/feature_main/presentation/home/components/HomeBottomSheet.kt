@@ -31,6 +31,7 @@ fun HomeBottomSheet(
     onHideButtonClick: () -> Unit,
     onDepartureSelectButtonClick: () -> Unit,
     onDestinationSelectButtonClick: () -> Unit,
+    onDispatchButtonClick: () -> Unit
 ) {
     ModalBottomSheet(
         modifier = Modifier
@@ -56,7 +57,8 @@ fun HomeBottomSheet(
             uiState = uiState,
             onHideButtonClick = onHideButtonClick,
             onDepartureSelectButtonClick = onDepartureSelectButtonClick,
-            onDestinationSelectButtonClick = onDestinationSelectButtonClick
+            onDestinationSelectButtonClick = onDestinationSelectButtonClick,
+            onDispatchButtonClick = onDispatchButtonClick,
         )
     }
 }
@@ -68,6 +70,7 @@ fun HomeBottomSheetContent(
     onHideButtonClick: () -> Unit,
     onDepartureSelectButtonClick: () -> Unit,
     onDestinationSelectButtonClick: () -> Unit,
+    onDispatchButtonClick: () -> Unit,
 ) {
     Button(
         modifier = Modifier
@@ -106,7 +109,7 @@ fun HomeBottomSheetContent(
             ),
             onClick = {
                 if (uiState.hasAvailableGpsPath) {
-                    // TODO: Robot call transaction
+                    onDispatchButtonClick()
                 }
             }) {
             Text(

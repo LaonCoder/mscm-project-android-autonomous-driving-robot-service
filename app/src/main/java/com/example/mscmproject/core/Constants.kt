@@ -6,6 +6,7 @@ object Constants {
 
     //Collection References
     const val USER = "user"
+    const val SERVICE_LOCATION = "serviceLocation"
 
     //User fields
     const val DISPLAY_NAME = "displayName"

@@ -35,12 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.mscmproject.feature_auth.presentation.AuthViewModel
 import com.example.mscmproject.navigation.Screen
 import com.google.android.gms.auth.api.identity.BeginSignInResult
@@ -233,4 +235,13 @@ fun SignInScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun SignInScreenPreview() {
+    SignInScreen(
+        navController = rememberNavController(),
+        viewModel = hiltViewModel()
+    )
 }
